@@ -125,8 +125,6 @@ router.post("/login", async (req, res) => {
   req.session.user = {id: user._id ,username : user.username, email: user.email, adresse: user.adresse, phone : user.phone, role: user.role, id_company: user.id_company};
   req.session.isAuth = true;
   req.session.compteur = 0;
-  //res.redirect('/dashboard')
-  //res.send('you are connected now')
   res.send(req.session.user);
 });
 
