@@ -36,8 +36,13 @@ router.get('/getvehicules/:id', verifAuth, async (req, res) => {
   const vehicules = await Vehicule.find({ userId: req.params.id });
   res.send({ data: vehicules });
 });
-router.get('/statsvehicules', verifAuth, async (req, res) => {
+router.get('/statsvehicules/:id', verifAuth, async (req, res) => {
   const vehicules = await Vehicule.aggregate([
+    {
+      $match: {
+        userId: req.params.id,
+      },
+    },
     {
       $group: {
         _id: '$modele',
@@ -65,20 +70,18 @@ router.post(
     res.send({ data: vehicule });
   }
 );
-//{_id: "607f65ff29fd3035b818801f", username: "aymen", email: "aymen@gmail.com", adresse: "paris", phone: "70604051", …}
 router.get('/vehicules/:id', verifAuth, async (req, res) => {
   const vehicules = await Vehicule.findById(req.params.id);
   res.send({ data: vehicules });
 });
 
-router.get('/archives/:id', verifAuth, async (req, res) => {
-  try {
-    const archive = await Archive.findById(req.params.id);
-    await archive.remove();
-    res.send({ data: true });
-  } catch {
-    res.status(404).send({ error: 'Vehicule is not found' });
-  }
+router.get('/getarchives/:id', verifAuth, async (req, res) => {
+  const archive = await Archive.find({ userId: req.params.id });
+  res.send({ data: archive });
+});
+router.get('/getvehicules/:id', verifAuth, async (req, res) => {
+  const vehicules = await Vehicule.find({ userId: req.params.id });
+  res.send({ data: vehicules });
 });
 
 router.delete('/vehicules/:id', verifAuth, async (req, res) => {
@@ -87,10 +90,12 @@ router.delete('/vehicules/:id', verifAuth, async (req, res) => {
     modele = vehicule.modele;
     marque = vehicule.marque;
     image = vehicule.image;
+    userId = vehicule.userId;
     const archive = new Archive({
       modele,
       marque,
       image,
+      userId,
     });
     await archive.save();
     await vehicule.remove();
@@ -102,10 +107,22 @@ router.delete('/vehicules/:id', verifAuth, async (req, res) => {
     res.status(404).send({ error: 'Vehicule is not found' });
   }
 });
-router.get('/getarchives', verifAuth, async (req, res) => {
+router.get('/archives', verifAuth, async (req, res) => {
   const archives = await Archive.find();
   console.log('archives', archives);
   res.send({ data: archives });
+});
+router.delete('/archives/:id', verifAuth, async (req, res) => {
+  try {
+    const archive = await Archive.findById(req.params.id);
+
+    await archive.remove();
+    console.log('deleted items', archive);
+
+    res.send('deleted');
+  } catch {
+    res.status(404).send({ error: 'Vehicule is not found' });
+  }
 });
 router.patch(
   '/vehicules/:id',

@@ -1,6 +1,8 @@
 var express = require('express');
 const Admindel = require('../../models/Admindelivery');
 var router = express.Router();
+var nodemailer = require('nodemailer');
+
 const verifAuth = (req, res, next) => {
   if (req.session.isAuth) {
     next();
@@ -9,6 +11,40 @@ const verifAuth = (req, res, next) => {
   }
 };
 
+router.post('/add/:id', verifAuth, async function (req, res, next) {
+  const delivery = await Delivery.findById(req.params.id);
+  const admintab = new Admindel(req.body);
+  admintab.save();
+  console.log('admin tab :', admintab);
+  console.log('delivery : ', delivery.email);
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    auth: {
+      user: 'raedjarboui1998@gmail.com',
+      pass: 'halamadrid02',
+    },
+  });
+
+  let mailOptions = {
+    from: 'raedjarboui1998@gmail.com',
+    to: delivery.email,
+    subject: 'your delivery passed succesfully',
+    text: 'hi',
+  };
+
+  transporter.sendMail(mailOptions, (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('email sent !!!');
+    }
+  });
+
+  res.send({ data: admintab });
+});
 router.get(
   '/all/deliveryman/package/from/:deliverymanId',
   verifAuth,
