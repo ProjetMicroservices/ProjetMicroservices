@@ -169,7 +169,7 @@ router.post("/reset-password",(req,res)=>{
           subject : "Password reset",
           html : `
           <p>You request for password reset</p>
-          <h5>Click in this <a href="https://view-distance.herokuapp.com/newpassword/${token}">link</a> to reset password</h5>
+          <h5>Click in this <a href="https://shortdistance.herokuapp.com/newpassword/${token}">link</a> to reset password</h5>
           `
         })
         res.send("check your email")

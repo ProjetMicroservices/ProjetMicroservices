@@ -94,7 +94,7 @@ const verifAuth = (req, res, next)=>{
           html : `
           <p>Hello,</p>
           <h4>Welcome to our platform, your request to create an account has been accepted, 
-          if you have forgotten your password you can change it with this <a href="https://view-distance.herokuapp.com/resetpassword">link</a>.</h4>
+          if you have forgotten your password you can change it with this <a href="https://shortdistance.herokuapp.com/resetpassword">link</a>.</h4>
           `
         })
         res.send(user)
