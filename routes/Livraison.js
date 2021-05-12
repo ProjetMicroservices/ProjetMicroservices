@@ -78,6 +78,24 @@ router.get("/getLivraisonWithUser", async (req, res) => {
     res.status(400).json({ msg: " Livraison errur ajout" });
   }
 });
+
+router.get("/getLivraisonWithCompany/:id", async (req, res) => {
+  try {
+    const livraison = await Livraison.find({
+      id_company: req.params.id,
+      State: "Pending",
+    }).populate({
+      path: "id_user",
+      model: "user",
+      select: "-password", // <-- this is the way
+    });
+    res.status(200).json({ livraison });
+  } catch (error) {
+    console.log("erreur ajout", error);
+    res.status(400).json({ msg: " Livraison errur ajout" });
+  }
+});
+
 router.post("/getLivraisonsByProvider", async (req, res) => {
   try {
     const livraison = await Livraison.find({

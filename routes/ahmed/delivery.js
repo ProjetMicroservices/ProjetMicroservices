@@ -1,37 +1,72 @@
-var express = require('express');
-const Delivery = require('../../models/Delivery');
-const checkboxModel = require('../../models/checkboxModel ');
+var express = require("express");
+const Delivery = require("../../models/Delivery");
+const checkboxModel = require("../../models/checkboxModel ");
 var router = express.Router();
-const twilio = require('twilio');
-var TMClient = require('textmagic-rest-client');
-const Vonage = require('@vonage/server-sdk');
-const Nexmo = require('nexmo');
+const twilio = require("twilio");
+var TMClient = require("textmagic-rest-client");
+const Vonage = require("@vonage/server-sdk");
+const Nexmo = require("nexmo");
 
 const verifAuth = (req, res, next) => {
   if (req.session.isAuth) {
     next();
   } else {
-    res.redirect('/auth');
+    res.redirect("/auth");
   }
 };
 
-router.post('/add', verifAuth, async function (req, res, next) {
+router.post("/add", verifAuth, async function (req, res, next) {
   const devv = new Delivery(req.body);
   await devv.save();
 
-  res.send({ data: devv });
+  //  res.send({ data: devv });
+  // { data: devv },
+
+  const longitude = req.body.long;
+  const latitude = req.body.lat;
+  const longitudeD = req.body.longDestination;
+  const latitudeD = req.body.latDestination;
+  let loc = {
+    type: "Point",
+    coordinates: [36.7950523, 10.1756372],
+  };
+  let locD = {
+    type: "Point",
+    coordinates: [36.8073671, 10.1506492],
+  };
+
+  const objet = {
+    fromPlace: devv.from,
+    destinationPlace: devv.to,
+    description: devv.description,
+    id_user: devv.userId,
+    id_company: devv.companyId,
+    loc: loc,
+    locDestination: locD,
+    State: "Pending",
+  };
+
+  try {
+    const deli = new Livraison(objet);
+
+    await deli.save();
+    console.log("zz", deli);
+    res.send({ data: devv, del: deli });
+  } catch (err) {
+    res.send(err);
+  }
   // { data: devv },
 });
 
-router.get('/twilio', verifAuth, async function (req, res) {
+router.get("/twilio", verifAuth, async function (req, res) {
   var client = new twilio(
-    'AC4bdb76fef466fad0b893541c46dc27b2',
-    'a3d4dc7f24d5cda12a485c86584ac7a9'
+    "AC4bdb76fef466fad0b893541c46dc27b2",
+    "a3d4dc7f24d5cda12a485c86584ac7a9"
   );
   client.messages.create({
-    to: '+21625535312',
-    from: '+14013292102 ',
-    body: 'your delivery passed',
+    to: "+21625535312",
+    from: "+14013292102 ",
+    body: "your delivery passed",
   });
   // const nexmo = new Nexmo({
   //   apiKey: 'd846fdba',
@@ -56,10 +91,10 @@ router.get('/twilio', verifAuth, async function (req, res) {
   //   }
   // });
 
-  res.send('sms send');
+  res.send("sms send");
 });
 
-router.get('/all/:id', verifAuth, async function (req, res, next) {
+router.get("/all/:id", verifAuth, async function (req, res, next) {
   const devv = await Delivery.find(
     { userId: req.params.id }
     // { _id: 1, username: 1, email: 1, adresse: 1, phone: 1 }
@@ -67,7 +102,7 @@ router.get('/all/:id', verifAuth, async function (req, res, next) {
   res.send({ data: devv });
 });
 router.get(
-  '/listdeliverybycompany/:id',
+  "/listdeliverybycompany/:id",
   verifAuth,
   async function (req, res, next) {
     const devv = await Delivery.find(
@@ -78,59 +113,59 @@ router.get(
   }
 );
 
-router.get('/passdelivery/:id', verifAuth, async (req, res, next) => {
+router.get("/passdelivery/:id", verifAuth, async (req, res, next) => {
   try {
     const devv = await Delivery.findById(req.params.id);
     res.send({ data: devv });
   } catch (error) {
-    res.status(404).send({ error: 'delivery not found try again' });
+    res.status(404).send({ error: "delivery not found try again" });
   }
 });
 
-router.delete('/passdelivery/:id', verifAuth, async (req, res, next) => {
+router.delete("/passdelivery/:id", verifAuth, async (req, res, next) => {
   try {
     const devv = await Delivery.findById(req.params.id);
     await devv.remove();
     res.send({ data: true });
   } catch (error) {
-    res.status(404).send({ error: 'delivery not found try again' });
+    res.status(404).send({ error: "delivery not found try again" });
   }
 });
 
-router.patch('/passdelivery/:id', verifAuth, async (req, res, next) => {
+router.patch("/passdelivery/:id", verifAuth, async (req, res, next) => {
   try {
     const devv = await Delivery.findById(req.params.id);
     Object.assign(devv, req.body);
     devv.save();
     res.send({ data: devv });
   } catch (error) {
-    res.status(404).send({ error: 'delivery not found try again' });
+    res.status(404).send({ error: "delivery not found try again" });
   }
 });
 
-router.get('/admin/passdelivery/:id', verifAuth, async (req, res, next) => {
+router.get("/admin/passdelivery/:id", verifAuth, async (req, res, next) => {
   try {
     const devv = await checkboxModel.findById(req.params.id);
     res.send({ data: devv });
     console.log(req.body);
   } catch (error) {
-    res.status(404).send({ error: 'delivery not found try again' });
+    res.status(404).send({ error: "delivery not found try again" });
   }
 });
 
-router.get('/all/from', verifAuth, async (req, res, next) => {
+router.get("/all/from", verifAuth, async (req, res, next) => {
   const devv = await Delivery.find({}, { _id: 0, from: 1 });
   res.send({ data: devv });
 });
-router.get('/all/to', verifAuth, async function (req, res, next) {
+router.get("/all/to", verifAuth, async function (req, res, next) {
   const devv = await Delivery.find({}, { _id: 0, to: 1 });
   res.send({ data: devv });
 });
-router.get('/stat_all_deliverys', verifAuth, async (req, res) => {
+router.get("/stat_all_deliverys", verifAuth, async (req, res) => {
   const deliverystat = await Delivery.aggregate([
     {
       $group: {
-        _id: '$adresse',
+        _id: "$adresse",
         count: { $sum: 1 },
       },
     },
