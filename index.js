@@ -8,6 +8,9 @@ const cors = require("cors");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const MongoDBSession = require("connect-mongodb-session")(session);
+const { ApolloServer , PubSub} = require('apollo-server');
+const resolvers = require('./graphql/resolvers'); 
+const typeDefs=require('./graphql/typeDefs');
 
 var authRouter = require("./routes/auth");
 var mailRouter = require("./routes/mail");
@@ -27,6 +30,28 @@ var sendpointRouter = require("./routes/ahmed/sendpoint");
 var providerRouter = require("./routes/Provider");
 var livraisonRouter = require("./routes/Livraison");
 
+//takwa
+var freeDeliveryRouter = require('./routes/freeDelivery');
+var smsRouter = require('./routes/sms');
+var claimRouter = require('./routes/claim');
+var conversationRouter = require('./routes/conversations');
+var messageRouter = require('./routes/messages');
+
+
+
+const pubsub = new PubSub();
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context:({req}) => ({req,pubsub})
+});
+
+
+
+
+
+
 app.use(express.json());
 app.use(express.static("frontend/build"));
 app.use(express.urlencoded({ extended: false }));
@@ -43,6 +68,8 @@ mongoose
     }
   )
   .then((res) => console.log("je suis connecter avec mongo"));
+
+
 mongoose.set("useFindAndModify", false);
 const store = new MongoDBSession({
   uri:
@@ -84,6 +111,19 @@ app.get("/api/youtube", (req, res) => {
 app.use("/provider", providerRouter);
 app.use("/livraison", livraisonRouter);
 
+//takwa
+app.use('/freeDelivery',freeDeliveryRouter)
+app.use('/sms',smsRouter)
+app.use('/claim',claimRouter)
+app.use('/conversations',conversationRouter)
+app.use('/messages',messageRouter)
+
+
+
+
+
+
+
 const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => {
   console.log(`le serveur est lancé sur ${PORT}`);
@@ -92,3 +132,4 @@ app.get("/*", (_, res) => {
   res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
 });
 expressListRoutes(app, { prefix: "" });
+
