@@ -7,10 +7,10 @@ var {google} = require('googleapis')
 const userModel = require("../models/user");
 const compwaitModel = require("../models/compwaiting");
 
-const CLIENT_ID = '888983214216-0eidl17pv0gsogdhoaa1goagp08ashjr.apps.googleusercontent.com'
-const CLIENT_SECRET = 'YtybFzMFMCzmWsXMOXLpqnuq'
+const CLIENT_ID = '625687192622-0dc7oul1sus818g8kp3qepco9h23qcve.apps.googleusercontent.com'
+const CLIENT_SECRET = '5Yi4mQEXV505pLKpW3xDF03D'
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
-const REFRESH_TOKEN = '1//04dYn748hrjdhCgYIARAAGAQSNwF-L9Ir5_VR58NZ6U8It82O9nrCENGVVLsX7vYO47cXwhr4L3WWaRzOUVV9hhgusszDPbSPJwk'
+const REFRESH_TOKEN = '1//04whlIzunliSnCgYIARAAGAQSNwF-L9IrgBJVesCMtyXX2sH5W4mOK5U3hR9HUhAe1MH05IQmYA57KnQbrtNvUbkmlhQv7ns0Ows'
 
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN})
